@@ -6,7 +6,7 @@ CSSを追加しているだけなので実質UserCSSです。
 - https://blog.dnek.net/entry/2024/08/06/170118
 
 ## インストール
-- Greasy Fork （追加予定）
+- Greasy Fork https://greasyfork.org/ja/scripts/502848-nicovideo-player-expander
 - https://github.com/dnek/nicovideo-player-expander/raw/main/nicovideo-player-expander.user.js
 
 ## 関連
