@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        nicovideo-player-expander
 // @namespace   https://github.com/dnek
-// @version     1.2
+// @version     1.3
 // @author      dnek
 // @description Move the sidebar down and expand the player to fit the window size on nicovideo.
 // @description:ja    ニコニコ動画のサイドバーを下に移動し、ウィンドウサイズに合わせてプレイヤーを拡大します。プレイヤー右下の全画面表示アイコンの左隣のアイコンでこの機能のON/OFFを切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
@@ -52,6 +52,25 @@
         position: fixed;
         top: calc(var(--sizes-common-header-in-view-height) + var(--sizes-web-header-height) + var(--spacing-x3));
         width: var(--sizes-watch-sidebar-width);
+    }
+    div:has(> div > button[aria-label="コメント投稿ボタン"]) {
+        min-width: auto !important;
+    }
+    @media (max-width: 600px) {
+        div.d_flex:has(> button[aria-label$=" 秒戻し"]) {
+            gap: 0;
+            > div.d_flex {
+                flex-flow: column;
+                > span.mx_x0_5 {
+                    display: none;
+                }
+            }
+        }
+    }
+    @media (max-width: 550px) {
+        div:has(> button[aria-label="プレーヤー設定"]) {
+            gap: 0;
+        }
     }
 }
 `);
