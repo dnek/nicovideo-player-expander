@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        nicovideo-player-expander
 // @namespace   https://github.com/dnek
-// @version     1.4
+// @version     1.5
 // @author      dnek
 // @description Move the sidebar down and expand the player to fit the window size on nicovideo.
 // @description:ja    ニコニコ動画のサイドバーを下に移動し、ウィンドウサイズに合わせてプレイヤーを拡大します。プレイヤー右下の全画面表示アイコンの左隣のアイコンでこの機能のON/OFFを切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
@@ -57,7 +57,7 @@
         min-width: auto !important;
     }
     @media (max-width: 600px), (max-height: 650px) {
-        div.d_flex:has(> button[aria-label$=" 秒戻し"]) {
+        div.d_flex:has(> button[aria-label$=" 秒戻る"]) {
             gap: 0;
             > div.d_flex {
                 flex-flow: column;
@@ -68,7 +68,7 @@
         }
     }
     @media (max-width: 550px), (max-height: 620px) {
-        div:has(> button[aria-label="プレーヤー設定"]) {
+        div:has(> button[aria-label="設定"]) {
             gap: 0;
         }
     }
@@ -77,7 +77,7 @@
     expanderStyleEl.disabled = await getIsExpanded();
 
     const initExpandButton = (parentNode) => {
-        const fullScreenButtonEl = parentNode.querySelector('button[aria-label="フルスクリーン表示"]');
+        const fullScreenButtonEl = parentNode.querySelector('button[aria-label="全画面表示する"]');
         if (fullScreenButtonEl !== null) {
             const expandButtonEl = document.createElement('button');
             expandButtonEl.setAttribute('class', 'cursor_pointer');
@@ -113,7 +113,7 @@
             for (const node of mutation.addedNodes) {
                 if (
                     node.nodeType === 1 &&
-                    node.innerHTML.includes('aria-label="フルスクリーン表示"')
+                    node.innerHTML.includes('aria-label="全画面表示する"')
                 ) {
                     initExpandButton(node);
                 }
