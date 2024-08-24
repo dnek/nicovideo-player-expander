@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        nicovideo-player-expander
 // @namespace   https://github.com/dnek
-// @version     1.6
+// @version     1.7
 // @author      dnek
 // @description ニコニコ動画のサイドバーを下に移動し、ウィンドウサイズに合わせてプレイヤーを拡大します。プレイヤー右下の全画面表示アイコンの左隣のアイコンでこの機能のON/OFFを切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
 // @description:ja    ニコニコ動画のサイドバーを下に移動し、ウィンドウサイズに合わせてプレイヤーを拡大します。プレイヤー右下の全画面表示アイコンの左隣のアイコンでこの機能のON/OFFを切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
@@ -76,52 +76,49 @@
 `);
     expanderStyleEl.disabled = await getIsExpanded();
 
-    const initExpandButton = (parentNode) => {
-        const fullScreenButtonEl = parentNode.querySelector('button[aria-label="全画面表示する"]');
-        if (fullScreenButtonEl !== null) {
-            const expandButtonEl = document.createElement('button');
-            expandButtonEl.setAttribute('class', 'cursor_pointer');
-            expandButtonEl.setAttribute('tabindex', '0');
-            expandButtonEl.setAttribute('type', 'button');
-            fullScreenButtonEl.before(expandButtonEl);
+    const EXPAND_BUTTON_ID = 'nicovideoPlayerExpanderButton';
 
-            const refreshExpansion = async () => {
-                const isExpanded = await getIsExpanded();
-                expanderStyleEl.disabled = !isExpanded;
-                // These SVGs are chevrons-collapse-from-lines.svg and chevrons-expand-to-lines.svg in gravity-ui/icons.
-                // gravity-ui/icons is licensed under the MIT License.
-                // https://github.com/gravity-ui/icons/blob/main/LICENSE
-                const svgPath = isExpanded ?
-                    '<path fill-rule="evenodd" d="M1.5 2.75a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zm14.5 0a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zM3.47 4.97a.75.75 0 0 0 0 1.06L5.44 8L3.47 9.97a.75.75 0 1 0 1.06 1.06l2.5-2.5a.75.75 0 0 0 0-1.06l-2.5-2.5a.75.75 0 0 0-1.06 0m9.06 1.06a.75.75 0 0 0-1.06-1.06l-2.5 2.5a.75.75 0 0 0 0 1.06l2.5 2.5a.75.75 0 1 0 1.06-1.06L10.56 8z" clip-rule="evenodd"/>' :
-                    '<path fill-rule="evenodd" d="M1.5 2.75a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zm14.5 0a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zM6.53 4.97a.75.75 0 0 1 0 1.06L4.56 8l1.97 1.97a.75.75 0 1 1-1.06 1.06l-2.5-2.5a.75.75 0 0 1 0-1.06l2.5-2.5a.75.75 0 0 1 1.06 0m2.94 1.06a.75.75 0 0 1 1.06-1.06l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 1 1-1.06-1.06L11.44 8z" clip-rule="evenodd"/>';
-                expandButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16" class="w_auto h_x5 p_base fill_icon.watchControllerBase hover:fill_icon.watchControllerHover">${svgPath}</svg>`;
-                expandButtonEl.setAttribute('aria-label', isExpanded ? 'ウィンドウサイズ解除' : 'ウィンドウサイズ表示');
-            };
-
-            refreshExpansion();
-
-            expandButtonEl.addEventListener('click', async () => {
-                await GM_setValue('isExpanded', !(await getIsExpanded()));
-                await refreshExpansion();
-            });
+    const initExpandButton = () => {
+        const fullScreenButtonEl = document.querySelector('button[aria-label="全画面表示する"]');
+        if (fullScreenButtonEl === null) {
+            return;
         }
 
+        const expandButtonEl = document.createElement('button');
+        expandButtonEl.setAttribute('id', EXPAND_BUTTON_ID);
+        expandButtonEl.setAttribute('class', 'cursor_pointer');
+        expandButtonEl.setAttribute('tabindex', '0');
+        expandButtonEl.setAttribute('type', 'button');
+        fullScreenButtonEl.before(expandButtonEl);
+
+        console.log('expand button is added.');
+
+        const refreshExpansion = async () => {
+            const isExpanded = await getIsExpanded();
+            console.log(`expansion is ${isExpanded ? 'enabled' : 'disabled'}.`);
+
+            expanderStyleEl.disabled = !isExpanded;
+            // These SVGs are chevrons-collapse-from-lines.svg and chevrons-expand-to-lines.svg in gravity-ui/icons.
+            // gravity-ui/icons is licensed under the MIT License.
+            // https://github.com/gravity-ui/icons/blob/main/LICENSE
+            const svgPath = isExpanded ?
+                '<path fill-rule="evenodd" d="M1.5 2.75a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zm14.5 0a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zM3.47 4.97a.75.75 0 0 0 0 1.06L5.44 8L3.47 9.97a.75.75 0 1 0 1.06 1.06l2.5-2.5a.75.75 0 0 0 0-1.06l-2.5-2.5a.75.75 0 0 0-1.06 0m9.06 1.06a.75.75 0 0 0-1.06-1.06l-2.5 2.5a.75.75 0 0 0 0 1.06l2.5 2.5a.75.75 0 1 0 1.06-1.06L10.56 8z" clip-rule="evenodd"/>' :
+                '<path fill-rule="evenodd" d="M1.5 2.75a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zm14.5 0a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zM6.53 4.97a.75.75 0 0 1 0 1.06L4.56 8l1.97 1.97a.75.75 0 1 1-1.06 1.06l-2.5-2.5a.75.75 0 0 1 0-1.06l2.5-2.5a.75.75 0 0 1 1.06 0m2.94 1.06a.75.75 0 0 1 1.06-1.06l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 1 1-1.06-1.06L11.44 8z" clip-rule="evenodd"/>';
+            expandButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16" class="w_auto h_x5 p_base fill_icon.watchControllerBase hover:fill_icon.watchControllerHover">${svgPath}</svg>`;
+            expandButtonEl.setAttribute('aria-label', isExpanded ? 'ウィンドウサイズ解除' : 'ウィンドウサイズ表示');
+        };
+
+        refreshExpansion();
+
+        expandButtonEl.addEventListener('click', async () => {
+            await GM_setValue('isExpanded', !(await getIsExpanded()));
+            await refreshExpansion();
+        });
     };
 
-    const observer = new MutationObserver((mutationList, observer) => {
-        mutationList.filter(mutation => mutation.type === 'childList').forEach(mutation => {
-            for (const node of mutation.addedNodes) {
-                if (
-                    node.nodeType === 1 &&
-                    node.innerHTML.includes('aria-label="全画面表示する"')
-                ) {
-                    initExpandButton(node);
-                }
-            }
-        });
-    });
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-    });
+    setInterval(() => {
+        if (document.getElementById(EXPAND_BUTTON_ID) === null) {
+            initExpandButton();
+        }
+    }, 100);
 })();
