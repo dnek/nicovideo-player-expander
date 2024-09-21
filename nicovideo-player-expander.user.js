@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name        nicovideo-player-expander
 // @namespace   https://github.com/dnek
-// @version     1.7
+// @version     2.0
 // @author      dnek
-// @description ニコニコ動画のサイドバーを下に移動し、ウィンドウサイズに合わせてプレイヤーを拡大します。プレイヤー右下の全画面表示アイコンの左隣のアイコンでこの機能のON/OFFを切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
-// @description:ja    ニコニコ動画のサイドバーを下に移動し、ウィンドウサイズに合わせてプレイヤーを拡大します。プレイヤー右下の全画面表示アイコンの左隣のアイコンでこの機能のON/OFFを切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
+// @description ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
+// @description:ja    ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
 // @homepageURL https://github.com/dnek/nicovideo-player-expander
 // @updateURL   https://github.com/dnek/nicovideo-player-expander/raw/main/nicovideo-player-expander.user.js
 // @downloadURL https://github.com/dnek/nicovideo-player-expander/raw/main/nicovideo-player-expander.user.js
@@ -18,9 +18,12 @@
 (async function () {
     'use strict';
 
-    const getIsExpanded = async () => await GM_getValue('isExpanded', true);
+    const THEATER_MODE_BUTTON_CONTAINER_ID = 'npebTheaterModeButtonContainer';
+    const BROWSWER_FULL_BUTTON_CONTAINER_ID = 'npebBrowswerFullButtonContainer';
 
-    const expanderStyleEl = GM_addStyle(`
+    const getIsTheaterMode = async () => await GM_getValue('isExpanded', true);
+
+    const theaterModeStyleEl = GM_addStyle(`
 @media not all and (display-mode: fullscreen) {
     #root > div.min-w_\\[max-content\\] {
         min-width: auto;
@@ -56,7 +59,12 @@
     div:has(> div > button[aria-label="コメント投稿ボタン"]) {
         min-width: auto !important;
     }
-    @media (max-width: 600px), (max-height: 650px) {
+    @media (max-width: 720px), (max-height: 720px) {
+        div:has(> button[aria-label="設定"]) {
+            gap: 0;
+        }
+    }
+    @media (max-width: 650px), (max-height: 680px) {
         div.d_flex:has(> button[aria-label$=" 秒戻る"]) {
             gap: 0;
             > div.d_flex {
@@ -67,58 +75,245 @@
             }
         }
     }
-    @media (max-width: 550px), (max-height: 620px) {
-        div:has(> button[aria-label="設定"]) {
-            gap: 0;
+    @media (max-width: 580px), (max-height: 640px) {
+        svg.fill_icon\\.watchControllerBase {
+            padding-inline: 4px;
         }
     }
 }
 `);
-    expanderStyleEl.disabled = await getIsExpanded();
+    theaterModeStyleEl.disabled = await getIsTheaterMode();
 
-    const EXPAND_BUTTON_ID = 'nicovideoPlayerExpanderButton';
+    let isBrowserFull = false;
 
-    const initExpandButton = () => {
+    const browserFullStyleEl = GM_addStyle(`
+@media not all and (display-mode: fullscreen) {
+    :not(
+        :has([data-styling-id=":r2:"]),
+        [data-styling-id=":r2:"], [data-styling-id=":r2:"] *,
+        :has([data-nvpc-scope="watch-floating-panel"]),
+        [data-nvpc-scope="watch-floating-panel"],
+        [data-nvpc-scope="watch-floating-panel"] *,
+        :is([data-scope="toast"]), :is([data-scope="toast"]) *,
+        :is(body > [data-part="positioner"]), :is(body > [data-part="positioner"]) *,
+        :is(body > [data-part="backdrop"]), :is(body > [data-part="backdrop"]) *,
+        body
+    ) {
+        display: none;
+    }
+    body {
+        overflow-y: hidden !important;
+    }
+    #root > div.min-w_\\[max-content\\] {
+        min-width: auto;
+    }
+    div[aria-label="nicovideo-content"] {
+        padding-block: 0;
+    }
+    div.grid-area_\\[player\\] div.bdr_m {
+        border-radius: 0;
+    }
+    div[aria-label="nicovideo-content"] > section.grid-template-areas_\\[_\\"player_sidebar\\"_\\"meta_sidebar\\"_\\"bottom_sidebar\\"_\\"\\._sidebar\\"_\\] {
+        grid-template-columns: 100vw;
+        grid-template-areas: "player" "meta" "bottom" "sidebar";
+        padding-inline: 0;
+        padding-bottom: 0;
+        row-gap: 0;
+    }
+    div[data-styling-id=":r3:"] {
+        aspect-ratio: auto;
+        height: calc(
+            100vh
+            - var(--watch-controller-height)
+            - var(--watch-player-actionbar-gap-height)
+            - var(--watch-actionbar-height)
+        );
+    }
+    div.grid-area_\\[sidebar\\] > div[data-nvpc-part="floating"] > section {
+        position: fixed;
+        top: var(--spacing-x3);
+        width: var(--sizes-watch-sidebar-width);
+    }
+    div:has(> div > button[aria-label="コメント投稿ボタン"]) {
+        min-width: auto !important;
+    }
+    @media (max-width: 640px) {
+        div.d_flex:has(> button[aria-label$=" 秒戻る"]) {
+            gap: 0;
+            > div.d_flex {
+                flex-flow: column;
+                > span.mx_x0_5 {
+                    display: none;
+                }
+            }
+        }
+    }
+    @media (max-width: 550px) {
+        div:has(> button[aria-label="設定"]) {
+            gap: 0;
+        }
+    }
+    #${THEATER_MODE_BUTTON_CONTAINER_ID}, button[aria-label="全画面表示する"] {
+        display: none;
+    }
+}
+`);
+    browserFullStyleEl.disabled = true;
+
+    GM_addStyle(`
+@media not all and (display-mode: fullscreen) {
+    .npeb_container {
+        display: grid;
+        > .npeb_tooltip_container {
+            position: relative;
+            > .npeb_tooltip {
+                visibility: hidden;
+                min-width: max-content;
+                background-color: var(--colors-tooltip-background);
+                color: var(--colors-tooltip-text-on-background);
+                font-size: var(--font-sizes-s);
+                border-radius: var(--radii-s);
+                padding: var(--spacing-base);
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translate(-50%, -135%);
+                opacity: 0;
+                transition: opacity .2s .2s;
+            }
+        }
+    }
+    .npeb_container:is(:hover,[data-hover]) .npeb_tooltip {
+        visibility: visible;
+        opacity: 1;
+    }
+    .npeb_icon {
+        stroke: var(--colors-icon-watch-controller-base);
+    }
+    .npeb_icon:is(:hover,[data-hover]) {
+        stroke: var(--colors-icon-watch-controller-hover);
+    }
+}
+`);
+
+    let switchTheaterMode = () => { };
+    let switchBrowserFull = () => { };
+
+    const initButtons = () => {
         const fullScreenButtonEl = document.querySelector('button[aria-label="全画面表示する"]');
         if (fullScreenButtonEl === null) {
             return;
         }
 
-        const expandButtonEl = document.createElement('button');
-        expandButtonEl.setAttribute('id', EXPAND_BUTTON_ID);
-        expandButtonEl.setAttribute('class', 'cursor_pointer');
-        expandButtonEl.setAttribute('tabindex', '0');
-        expandButtonEl.setAttribute('type', 'button');
-        fullScreenButtonEl.before(expandButtonEl);
+        const initButton = (containerId, svgPathToOn, svgPathToOff, captionToOn, captionToOff) => {
+            const buttonContainerEl = document.createElement('div');
+            buttonContainerEl.setAttribute('id', containerId);
+            buttonContainerEl.classList.add('npeb_container');
 
-        console.log('expand button is added.');
+            const tooltipContainerEl = document.createElement('div');
+            tooltipContainerEl.classList.add('npeb_tooltip_container');
 
-        const refreshExpansion = async () => {
-            const isExpanded = await getIsExpanded();
-            console.log(`expansion is ${isExpanded ? 'enabled' : 'disabled'}.`);
+            const tooltipEl = document.createElement('span');
+            tooltipEl.classList.add('npeb_tooltip');
+            tooltipContainerEl.appendChild(tooltipEl);
 
-            expanderStyleEl.disabled = !isExpanded;
-            // These SVGs are chevrons-collapse-from-lines.svg and chevrons-expand-to-lines.svg in gravity-ui/icons.
-            // gravity-ui/icons is licensed under the MIT License.
-            // https://github.com/gravity-ui/icons/blob/main/LICENSE
-            const svgPath = isExpanded ?
-                '<path fill-rule="evenodd" d="M1.5 2.75a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zm14.5 0a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zM3.47 4.97a.75.75 0 0 0 0 1.06L5.44 8L3.47 9.97a.75.75 0 1 0 1.06 1.06l2.5-2.5a.75.75 0 0 0 0-1.06l-2.5-2.5a.75.75 0 0 0-1.06 0m9.06 1.06a.75.75 0 0 0-1.06-1.06l-2.5 2.5a.75.75 0 0 0 0 1.06l2.5 2.5a.75.75 0 1 0 1.06-1.06L10.56 8z" clip-rule="evenodd"/>' :
-                '<path fill-rule="evenodd" d="M1.5 2.75a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zm14.5 0a.75.75 0 0 0-1.5 0v10.5a.75.75 0 0 0 1.5 0zM6.53 4.97a.75.75 0 0 1 0 1.06L4.56 8l1.97 1.97a.75.75 0 1 1-1.06 1.06l-2.5-2.5a.75.75 0 0 1 0-1.06l2.5-2.5a.75.75 0 0 1 1.06 0m2.94 1.06a.75.75 0 0 1 1.06-1.06l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 1 1-1.06-1.06L11.44 8z" clip-rule="evenodd"/>';
-            expandButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16" class="w_auto h_x5 p_base fill_icon.watchControllerBase hover:fill_icon.watchControllerHover">${svgPath}</svg>`;
-            expandButtonEl.setAttribute('aria-label', isExpanded ? 'ウィンドウサイズ解除' : 'ウィンドウサイズ表示');
+            buttonContainerEl.appendChild(tooltipContainerEl);
+
+            const buttonEl = document.createElement('button');
+            buttonEl.classList.add('cursor_pointer');
+            buttonEl.setAttribute('tabindex', '0');
+            buttonEl.setAttribute('type', 'button');
+            buttonContainerEl.appendChild(buttonEl);
+
+            fullScreenButtonEl.before(buttonContainerEl);
+
+            const setButtonIsOn = (isOn) => {
+                const svgPath = isOn ? svgPathToOff : svgPathToOn;
+                buttonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="w_auto h_x5 p_base fill_icon.watchControllerBase hover:fill_icon.watchControllerHover npeb_icon">${svgPath}</svg>`;
+                buttonEl.setAttribute('aria-label', isOn ? captionToOff : captionToOn);
+                tooltipEl.innerHTML = isOn ? captionToOff : captionToOn;
+            };
+
+            return [buttonEl, setButtonIsOn];
         };
 
-        refreshExpansion();
+        const [theaterModeButtonEl, setTheaterModeButtonIsOn] = initButton(
+            THEATER_MODE_BUTTON_CONTAINER_ID,
+            `<rect x="4" y="4" width="16" height="9" stroke-width="2" stroke-linejoin="round" />
+<rect x="4" y="18" width="16" height="2" stroke-width="2" stroke-linejoin="round" />`,
+            `<rect x="4" y="4" width="9" height="16" stroke-width="2" stroke-linejoin="round" />
+<rect x="18" y="4" width="2" height="16" stroke-width="2" stroke-linejoin="round" />`,
+            'シアターモードにする（t）',
+            'シアターモード解除（t）'
+        );
 
-        expandButtonEl.addEventListener('click', async () => {
-            await GM_setValue('isExpanded', !(await getIsExpanded()));
-            await refreshExpansion();
-        });
+        const [browswerFullButtonEl, setbrowswerFullButtonIsOn] = initButton(
+            BROWSWER_FULL_BUTTON_CONTAINER_ID,
+            `<rect x="1.5" y="2.5" width="21" height="19" fill="transparent" stroke-width="2" stroke-linejoin="round" />
+<polyline points="6,12 9,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<polyline points="6,12 9,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<polyline points="18,12 15,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<polyline points="18,12 15,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />`,
+            `<rect x="1.5" y="2.5" width="21" height="19" fill="transparent" stroke-width="2" stroke-linejoin="round" />
+<polyline points="10,12 7,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<polyline points="10,12 7,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<polyline points="14,12 17,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<polyline points="14,12 17,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />`,
+            'ブラウザ内で最大化する（b）',
+            'ブラウザ内最大化解除（b）'
+        );
+
+        const refreshButtonsAndStyles = async () => {
+            const isTheaterModeRequired = !isBrowserFull && (await getIsTheaterMode());
+            theaterModeStyleEl.disabled = !isTheaterModeRequired;
+            browserFullStyleEl.disabled = !isBrowserFull;
+            setTheaterModeButtonIsOn(isTheaterModeRequired);
+            setbrowswerFullButtonIsOn(isBrowserFull);
+        };
+
+        refreshButtonsAndStyles();
+
+        switchTheaterMode = async () => {
+            await GM_setValue('isExpanded', !(await getIsTheaterMode()));
+            refreshButtonsAndStyles();
+        };
+
+        theaterModeButtonEl.addEventListener('click', switchTheaterMode);
+
+        switchBrowserFull = () => {
+            isBrowserFull = !isBrowserFull;
+            refreshButtonsAndStyles();
+        };
+
+        browswerFullButtonEl.addEventListener('click', switchBrowserFull);
+
+        console.log('nicovideo-player-expander buttons are added.')
     };
 
+    document.addEventListener('keydown', (e) => {
+        if (document.fullscreenElement !== null) {
+            return;
+        }
+
+        if (e.target && ['input', 'textarea'].includes(e.target.tagName.toLowerCase())) {
+            return;
+        }
+        if (e.isComposing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.repeat) {
+            return;
+        }
+
+        if (e.code === 'KeyT' && !isBrowserFull) {
+            switchTheaterMode();
+        }
+
+        if (e.code === 'KeyB' || (e.code === 'Escape' && isBrowserFull)) {
+            switchBrowserFull();
+        }
+    });
+
     setInterval(() => {
-        if (document.getElementById(EXPAND_BUTTON_ID) === null) {
-            initExpandButton();
+        if (document.getElementById(THEATER_MODE_BUTTON_CONTAINER_ID) === null) {
+            initButtons();
         }
     }, 100);
 })();
