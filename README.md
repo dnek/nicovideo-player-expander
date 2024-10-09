@@ -1,6 +1,7 @@
 # nicovideo-player-expander
-[ニコニコ動画](https://www.nicovideo.jp/video_top)のサイドバーを下に移動し、ウィンドウサイズに合わせてプレイヤーを拡大するUserScriptです。
-プレイヤー右下の全画面表示アイコンの左隣のアイコンでこの機能のON/OFFを切り替えられます。
+[ニコニコ動画](https://www.nicovideo.jp/video_top)のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。
+プレイヤー右下のアイコンでこれらの機能を切り替えられます。
+それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。
 
 ## 紹介動画シリーズ
 - https://www.nicovideo.jp/user/134113088/series/487379
