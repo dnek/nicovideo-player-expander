@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        nicovideo-player-expander
 // @namespace   https://github.com/dnek
-// @version     2.1
+// @version     3.0
 // @author      dnek
 // @description ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
 // @description:ja    ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
@@ -15,13 +15,18 @@
 // @license     MIT license
 // ==/UserScript==
 
-(async function () {
+(async () => {
     'use strict';
 
     const THEATER_MODE_BUTTON_CONTAINER_ID = 'npebTheaterModeButtonContainer';
     const BROWSWER_FULL_BUTTON_CONTAINER_ID = 'npebBrowswerFullButtonContainer';
 
-    const getIsTheaterMode = async () => await GM_getValue('isExpanded', true);
+    let _isTheaterMode = await GM_getValue('isTheaterMode', false);
+    const getIsTheaterMode = () => _isTheaterMode;
+    const setIsTheaterMode = (newValue) => {
+        _isTheaterMode = newValue;
+        GM_setValue('isTheaterMode', newValue);
+    };
 
     const theaterModeStyleEl = GM_addStyle(`
 @media not all and (display-mode: fullscreen) {
@@ -82,7 +87,7 @@
     }
 }
 `);
-    theaterModeStyleEl.disabled = await getIsTheaterMode();
+    theaterModeStyleEl.disabled = getIsTheaterMode();
 
     let isBrowserFull = false;
 
@@ -269,7 +274,7 @@
         );
 
         const refreshButtonsAndStyles = async () => {
-            const isTheaterModeRequired = !isBrowserFull && (await getIsTheaterMode());
+            const isTheaterModeRequired = !isBrowserFull && getIsTheaterMode();
             theaterModeStyleEl.disabled = !isTheaterModeRequired;
             browserFullStyleEl.disabled = !isBrowserFull;
             setTheaterModeButtonIsOn(isTheaterModeRequired);
@@ -279,7 +284,7 @@
         refreshButtonsAndStyles();
 
         switchTheaterMode = async () => {
-            await GM_setValue('isExpanded', !(await getIsTheaterMode()));
+            setIsTheaterMode(!getIsTheaterMode());
             refreshButtonsAndStyles();
         };
 
