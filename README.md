@@ -10,6 +10,7 @@
 - https://blog.dnek.net/entry/2024/08/06/170118
 
 ## インストール
+- Chromeウェブストア https://chrome.google.com/webstore/detail/plgcngmhicjaoicgamcklfceeagoaefa
 - Greasy Fork https://greasyfork.org/ja/scripts/502848-nicovideo-player-expander
 - https://github.com/dnek/nicovideo-player-expander/raw/main/nicovideo-player-expander.user.js
 
