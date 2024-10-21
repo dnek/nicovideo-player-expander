@@ -26,7 +26,7 @@ const GM_addStyle = (content) => {
     'use strict';
 
     const THEATER_MODE_BUTTON_CONTAINER_ID = 'npebTheaterModeButtonContainer';
-    const BROWSWER_FULL_BUTTON_CONTAINER_ID = 'npebBrowswerFullButtonContainer';
+    const BROWSER_FULL_BUTTON_CONTAINER_ID = 'npebBrowserFullButtonContainer';
 
     let _isTheaterMode = await GM_getValue('isTheaterMode', false);
     const getIsTheaterMode = () => _isTheaterMode;
@@ -264,8 +264,8 @@ const GM_addStyle = (content) => {
             'シアターモード解除（t）'
         );
 
-        const [browswerFullButtonEl, setbrowswerFullButtonIsOn] = initButton(
-            BROWSWER_FULL_BUTTON_CONTAINER_ID,
+        const [browserFullButtonEl, setbrowserFullButtonIsOn] = initButton(
+            BROWSER_FULL_BUTTON_CONTAINER_ID,
             `<rect x="1.5" y="2.5" width="21" height="19" fill="transparent" stroke-width="2" stroke-linejoin="round" />
 <polyline points="6,12 9,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 <polyline points="6,12 9,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -285,7 +285,7 @@ const GM_addStyle = (content) => {
             theaterModeStyleEl.disabled = !isTheaterModeRequired;
             browserFullStyleEl.disabled = !isBrowserFull;
             setTheaterModeButtonIsOn(isTheaterModeRequired);
-            setbrowswerFullButtonIsOn(isBrowserFull);
+            setbrowserFullButtonIsOn(isBrowserFull);
         };
 
         refreshButtonsAndStyles();
@@ -302,7 +302,7 @@ const GM_addStyle = (content) => {
             refreshButtonsAndStyles();
         };
 
-        browswerFullButtonEl.addEventListener('click', switchBrowserFull);
+        browserFullButtonEl.addEventListener('click', switchBrowserFull);
 
         console.log('nicovideo-player-expander buttons are added.')
     };

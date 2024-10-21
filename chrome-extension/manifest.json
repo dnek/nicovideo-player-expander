@@ -1,6 +1,6 @@
 {
     "name": "nicovideo-player-expander",
-    "version": "3.0",
+    "version": "3.1",
     "manifest_version": 3,
     "description": "ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンかショートカットキーでこれらの機能を切り替えられます。",
     "background": {

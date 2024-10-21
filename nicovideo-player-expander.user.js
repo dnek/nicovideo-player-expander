@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        nicovideo-player-expander
 // @namespace   https://github.com/dnek
-// @version     3.0
+// @version     3.1
 // @author      dnek
 // @description ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
 // @description:ja    ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
@@ -19,7 +19,7 @@
     'use strict';
 
     const THEATER_MODE_BUTTON_CONTAINER_ID = 'npebTheaterModeButtonContainer';
-    const BROWSWER_FULL_BUTTON_CONTAINER_ID = 'npebBrowswerFullButtonContainer';
+    const BROWSER_FULL_BUTTON_CONTAINER_ID = 'npebBrowserFullButtonContainer';
 
     let _isTheaterMode = await GM_getValue('isTheaterMode', false);
     const getIsTheaterMode = () => _isTheaterMode;
@@ -257,8 +257,8 @@
             'シアターモード解除（t）'
         );
 
-        const [browswerFullButtonEl, setbrowswerFullButtonIsOn] = initButton(
-            BROWSWER_FULL_BUTTON_CONTAINER_ID,
+        const [browserFullButtonEl, setbrowserFullButtonIsOn] = initButton(
+            BROWSER_FULL_BUTTON_CONTAINER_ID,
             `<rect x="1.5" y="2.5" width="21" height="19" fill="transparent" stroke-width="2" stroke-linejoin="round" />
 <polyline points="6,12 9,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 <polyline points="6,12 9,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -278,7 +278,7 @@
             theaterModeStyleEl.disabled = !isTheaterModeRequired;
             browserFullStyleEl.disabled = !isBrowserFull;
             setTheaterModeButtonIsOn(isTheaterModeRequired);
-            setbrowswerFullButtonIsOn(isBrowserFull);
+            setbrowserFullButtonIsOn(isBrowserFull);
         };
 
         refreshButtonsAndStyles();
@@ -295,7 +295,7 @@
             refreshButtonsAndStyles();
         };
 
-        browswerFullButtonEl.addEventListener('click', switchBrowserFull);
+        browserFullButtonEl.addEventListener('click', switchBrowserFull);
 
         console.log('nicovideo-player-expander buttons are added.')
     };
