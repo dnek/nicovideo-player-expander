@@ -1,17 +1,9 @@
 // GM functions
-const GM_getValue = (key, defaultValue) =>
-    chrome.runtime.sendMessage({
-        type: 'get-value',
-        key,
-        defaultValue
-    });
+const GM_getValue = async (key, defaultValue) =>
+    (await chrome.storage.local.get({ [key]: defaultValue }))[key];
 
 const GM_setValue = (key, newValue) =>
-    chrome.runtime.sendMessage({
-        type: 'set-value',
-        key,
-        newValue
-    });
+    chrome.storage.local.set({ [key]: newValue });
 
 const GM_addStyle = (content) => {
     const styleEl = document.createElement('style');
