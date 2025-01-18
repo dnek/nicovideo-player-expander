@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        nicovideo-player-expander
 // @namespace   https://github.com/dnek
-// @version     3.2
+// @version     3.4
 // @author      dnek
 // @description ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
 // @description:ja    ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
@@ -212,7 +212,7 @@ div:has(> div > button[aria-label="コメント投稿ボタン"]) {
             return;
         }
 
-        const initButton = (containerId, svgPathToOn, svgPathToOff, captionToOn, captionToOff) => {
+        const initButton = (containerId, svgElToOn, svgElToOff, captionToOn, captionToOff) => {
             const buttonContainerEl = document.createElement('div');
             buttonContainerEl.setAttribute('id', containerId);
             buttonContainerEl.classList.add('npeb_container');
@@ -235,37 +235,94 @@ div:has(> div > button[aria-label="コメント投稿ボタン"]) {
             fullScreenButtonEl.before(buttonContainerEl);
 
             const setButtonIsOn = (isOn) => {
-                const svgPath = isOn ? svgPathToOff : svgPathToOn;
-                buttonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="w_auto h_x5 p_base fill_icon.watchControllerBase hover:fill_icon.watchControllerHover npeb_icon">${svgPath}</svg>`;
+                while (buttonEl.firstChild) {
+                    buttonEl.removeChild(buttonEl.firstChild);
+                }
+                buttonEl.appendChild(isOn ? svgElToOff : svgElToOn);
                 buttonEl.setAttribute('aria-label', isOn ? captionToOff : captionToOn);
-                tooltipEl.innerHTML = isOn ? captionToOff : captionToOn;
+                tooltipEl.innerText = isOn ? captionToOff : captionToOn;
             };
 
             return [buttonEl, setButtonIsOn];
         };
 
+        const SVG_NS = 'http://www.w3.org/2000/svg';
+
+        const createButtonSvgEl = () => {
+            const svgEl = document.createElementNS(SVG_NS, 'svg');
+            svgEl.setAttribute('width', '24');
+            svgEl.setAttribute('height', '24');
+            svgEl.setAttribute('viewBox', '0 0 24 24');
+            svgEl.classList.add('w_auto', 'h_x5', 'p_base', 'fill_icon.watchControllerBase', 'hover:fill_icon.watchControllerHover', 'npeb_icon');
+            return svgEl;
+        };
+
+        const createTheaterModeRectEl = (x, y, width, height) => {
+            const rectEl = document.createElementNS(SVG_NS, 'rect');
+            rectEl.setAttribute('x', x);
+            rectEl.setAttribute('y', y);
+            rectEl.setAttribute('width', width);
+            rectEl.setAttribute('height', height);
+            rectEl.setAttribute('stroke-width', '2');
+            rectEl.setAttribute('stroke-linejoin', 'round');
+            return rectEl;
+        }
+
+        const createbrowserFullRectEl = () => {
+            const rectEl = document.createElementNS(SVG_NS, 'rect');
+            rectEl.setAttribute('x', '1.5');
+            rectEl.setAttribute('y', '2.5');
+            rectEl.setAttribute('width', '21');
+            rectEl.setAttribute('height', '19');
+            rectEl.setAttribute('fill', 'transparent');
+            rectEl.setAttribute('stroke-width', '2');
+            rectEl.setAttribute('stroke-linejoin', 'round');
+            return rectEl;
+        };
+
+        const createPolylineEl = (points) => {
+            const polylineEl = document.createElementNS(SVG_NS, 'polyline');
+            polylineEl.setAttribute('points', points);
+            polylineEl.setAttribute('stroke-width', '2');
+            polylineEl.setAttribute('stroke-linecap', 'round');
+            polylineEl.setAttribute('stroke-linejoin', 'round');
+            return polylineEl;
+        };
+
+        const theaterModeToOnSvgEl = createButtonSvgEl();
+        theaterModeToOnSvgEl.appendChild(createTheaterModeRectEl('4', '4', '16', '9'));
+        theaterModeToOnSvgEl.appendChild(createTheaterModeRectEl('4', '18', '16', '2'));
+
+        const theaterModeToOffSvgEl = createButtonSvgEl();
+        theaterModeToOffSvgEl.appendChild(createTheaterModeRectEl('4', '4', '9', '16'));
+        theaterModeToOffSvgEl.appendChild(createTheaterModeRectEl('18', '4', '2', '16'));
+
         const [theaterModeButtonEl, setTheaterModeButtonIsOn] = initButton(
             THEATER_MODE_BUTTON_CONTAINER_ID,
-            `<rect x="4" y="4" width="16" height="9" stroke-width="2" stroke-linejoin="round" />
-<rect x="4" y="18" width="16" height="2" stroke-width="2" stroke-linejoin="round" />`,
-            `<rect x="4" y="4" width="9" height="16" stroke-width="2" stroke-linejoin="round" />
-<rect x="18" y="4" width="2" height="16" stroke-width="2" stroke-linejoin="round" />`,
+            theaterModeToOnSvgEl,
+            theaterModeToOffSvgEl,
             'シアターモードにする（t）',
             'シアターモード解除（t）'
         );
 
+        const browserFullToOnSvgEl = createButtonSvgEl();
+        browserFullToOnSvgEl.appendChild(createbrowserFullRectEl());
+        browserFullToOnSvgEl.appendChild(createPolylineEl('6,12 9,9'));
+        browserFullToOnSvgEl.appendChild(createPolylineEl('6,12 9,15'));
+        browserFullToOnSvgEl.appendChild(createPolylineEl('18,12 15,9'));
+        browserFullToOnSvgEl.appendChild(createPolylineEl('18,12 15,15'));
+
+        const browserFullToOffSvgEl = createButtonSvgEl();
+        browserFullToOffSvgEl.appendChild(createbrowserFullRectEl());
+        browserFullToOffSvgEl.appendChild(createPolylineEl('10,12 7,9'));
+        browserFullToOffSvgEl.appendChild(createPolylineEl('10,12 7,15'));
+        browserFullToOffSvgEl.appendChild(createPolylineEl('14,12 17,9'));
+        browserFullToOffSvgEl.appendChild(createPolylineEl('14,12 17,15'));
+
         const [browserFullButtonEl, setbrowserFullButtonIsOn] = initButton(
             BROWSER_FULL_BUTTON_CONTAINER_ID,
-            `<rect x="1.5" y="2.5" width="21" height="19" fill="transparent" stroke-width="2" stroke-linejoin="round" />
-<polyline points="6,12 9,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-<polyline points="6,12 9,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-<polyline points="18,12 15,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-<polyline points="18,12 15,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />`,
-            `<rect x="1.5" y="2.5" width="21" height="19" fill="transparent" stroke-width="2" stroke-linejoin="round" />
-<polyline points="10,12 7,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-<polyline points="10,12 7,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-<polyline points="14,12 17,9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-<polyline points="14,12 17,15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />`,
+            browserFullToOnSvgEl,
+            browserFullToOffSvgEl,
             'ブラウザ内で最大化する（b）',
             'ブラウザ内最大化解除（b）'
         );
