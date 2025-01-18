@@ -1,0 +1,28 @@
+{
+    "name": "nicovideo-player-expander",
+    "version": "3.4",
+    "manifest_version": 3,
+    "description": "ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化」）で拡大します。プレイヤー右下のアイコンかショートカットキーでこれらの機能を切り替えられます。",
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.nicovideo.jp/watch/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ],
+    "permissions": [
+        "storage"
+    ],
+    "icons": {
+        "128": "icons/icon_128.png"
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "nicovideo-player-expander@id-for-addon.dnek.net",
+            "strict_min_version": "109.0"
+        }
+    }
+}
