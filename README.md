@@ -20,4 +20,5 @@
 ## 関連
 - 自動再生直後に一時停止する拡張機能 https://github.com/dnek/nicovideo-autoplay-canceler
 - 連続再生を少し便利にする拡張機能 https://github.com/dnek/nicovideo-next-video-canceler
-- コントローラーを自然にフェードイン・フェードアウトさせる拡張機能 https://github.com/dnek/nicovideo-comfortable-controller-fader
+- ~~コントローラーを自然にフェードイン・フェードアウトさせる拡張機能 https://github.com/dnek/nicovideo-comfortable-controller-fader~~
+  - ニコニコ公式が解決済み
