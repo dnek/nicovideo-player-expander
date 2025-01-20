@@ -11,6 +11,7 @@
 
 ## インストール
 - Chromeウェブストア https://chrome.google.com/webstore/detail/plgcngmhicjaoicgamcklfceeagoaefa
+- Firefoxアドオン https://addons.mozilla.org/ja/firefox/addon/nicovideo-player-expander/
 - Greasy Fork（多くのブラウザに対応） https://greasyfork.org/ja/scripts/502848-nicovideo-player-expander
 
 ## ソース
