@@ -28,7 +28,7 @@ const GM_addStyle = (content) => {
     };
 
     const theaterModeStyleEl = GM_addStyle(`
-#root > div.min-w_\\[max-content\\] {
+#root > div.min-w_\\[min-content\\] {
     min-width: auto;
 }
 div[aria-label="nicovideo-content"] > section.grid-template-areas_\\[_\\"player_sidebar\\"_\\"meta_sidebar\\"_\\"bottom_sidebar\\"_\\"\\._sidebar\\"_\\] {
@@ -105,7 +105,7 @@ div:has(> div > button[aria-label="コメント投稿ボタン"]) {
 body {
     overflow-y: hidden !important;
 }
-#root > div.min-w_\\[max-content\\] {
+#root > div.min-w_\\[min-content\\] {
     min-width: auto;
 }
 div[aria-label="nicovideo-content"] {
