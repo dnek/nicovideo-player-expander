@@ -211,6 +211,8 @@ div:has(> div > button[aria-label="コメント投稿ボタン"]) {
             return;
         }
 
+        isBrowserFull = false;
+
         const initButton = (containerId, svgElToOn, svgElToOff, captionToOn, captionToOff) => {
             const buttonContainerEl = document.createElement('div');
             buttonContainerEl.setAttribute('id', containerId);
