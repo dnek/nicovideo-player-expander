@@ -90,8 +90,8 @@ div:has(> div > button[aria-label="コメント投稿ボタン"]) {
 
     const browserFullStyleEl = GM_addStyle(`
 :not(
-    :has([data-styling-id=":r2:"]),
-    [data-styling-id=":r2:"], [data-styling-id=":r2:"] *,
+    :has(div.grid-area_\\[player\\]),
+    div.grid-area_\\[player\\], div.grid-area_\\[player\\] *,
     :has([data-nvpc-scope="watch-floating-panel"]),
     [data-nvpc-scope="watch-floating-panel"],
     [data-nvpc-scope="watch-floating-panel"] *,
@@ -121,7 +121,7 @@ div[aria-label="nicovideo-content"] > section.grid-template-areas_\\[_\\"player_
     padding-bottom: 0;
     row-gap: 0;
 }
-div[data-styling-id=":r3:"] {
+div.grid-area_\\[player\\] > div.pos_relative > div.pos_relative > div.pos_relative {
     aspect-ratio: auto;
     height: calc(
         100vh
