@@ -357,10 +357,18 @@ div:has(> div > button[aria-label="コメント投稿ボタン"]) {
     };
 
     document.addEventListener('fullscreenchange', () => {
+        if (!location.href.startsWith('https://www.nicovideo.jp/watch/')) {
+            return;
+        }
+
         refreshButtonsAndStyles();
     });
 
     document.addEventListener('keydown', (e) => {
+        if (!location.href.startsWith('https://www.nicovideo.jp/watch/')) {
+            return;
+        }
+
         if (document.fullscreenElement !== null) {
             return;
         }
@@ -382,8 +390,16 @@ div:has(> div > button[aria-label="コメント投稿ボタン"]) {
     });
 
     setInterval(() => {
+        if (!location.href.startsWith('https://www.nicovideo.jp/watch/')) {
+            baseStyleEl.disabled = true;
+            videoFullscreenStyleEl.disabled = true;
+            theaterModeStyleEl.disabled = true;
+            browserFullStyleEl.disabled = true;
+            return;
+        }
+
         if (document.getElementById(THEATER_MODE_BUTTON_CONTAINER_ID) === null) {
             initButtons();
         }
-    }, 100);
+    }, 0);
 })();
