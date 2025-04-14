@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        nicovideo-player-expander
 // @namespace   https://github.com/dnek
-// @version     3.8
+// @version     3.9
 // @author      dnek
 // @description ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化（コントローラー常時表示可能）」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
 // @description:ja    ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化（コントローラー常時表示可能）」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
@@ -32,7 +32,7 @@
 #root > div.min-w_\\[min-content\\] {
     min-width: auto;
 }
-div[aria-label="nicovideo-content"] > section.grid-template-areas_\\[_\\"player_sidebar\\"_\\"meta_sidebar\\"_\\"bottom_sidebar\\"_\\"\\._sidebar\\"_\\] {
+div[aria-label="nicovideo-content"] > section {
     --watch-player-expandable-width-by-browser: calc(
         100vw
         - var(--watch-layout-gap-width) * 2
@@ -53,7 +53,7 @@ div[aria-label="nicovideo-content"] > section.grid-template-areas_\\[_\\"player_
         )
     );
     grid-template-columns: var(--watch-player-expandable-width);
-    grid-template-areas: "player" "meta" "bottom" "sidebar";
+    grid-template-areas: "player" "bottom" "sidebar";
 }
 div.grid-area_\\[sidebar\\] > div[data-nvpc-part="floating"] > section {
     position: fixed;
@@ -115,9 +115,9 @@ div[aria-label="nicovideo-content"] {
 div.grid-area_\\[player\\] div.bdr_m {
     border-radius: 0;
 }
-div[aria-label="nicovideo-content"] > section.grid-template-areas_\\[_\\"player_sidebar\\"_\\"meta_sidebar\\"_\\"bottom_sidebar\\"_\\"\\._sidebar\\"_\\] {
+div[aria-label="nicovideo-content"] > section {
     grid-template-columns: 100vw;
-    grid-template-areas: "player" "meta" "bottom" "sidebar";
+    grid-template-areas: "player" "bottom" "sidebar";
     padding-inline: 0;
     padding-bottom: 0;
     row-gap: 0;
