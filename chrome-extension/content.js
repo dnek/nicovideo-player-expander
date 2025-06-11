@@ -121,7 +121,7 @@ div[aria-label="nicovideo-content"] > section {
     padding-bottom: 0;
     row-gap: 0;
 }
-div.grid-area_\\[player\\] > div.pos_relative > div.pos_relative > div.pos_relative {
+div.grid-area_\\[player\\] > div.pos_relative > div.pos_relative > div.pos_relative:has(video) {
     aspect-ratio: auto;
     height: calc(
         100vh
