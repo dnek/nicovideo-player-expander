@@ -32,7 +32,7 @@
 #root > div.min-w_\\[min-content\\] {
     min-width: auto;
 }
-div[aria-label="nicovideo-content"] > section {
+div[aria-label="nicovideo-content"] section {
     --watch-player-expandable-width-by-browser: calc(
         100vw
         - var(--watch-layout-gap-width) * 2
@@ -111,16 +111,20 @@ body {
 }
 div[aria-label="nicovideo-content"] {
     padding-block: 0;
+    position: fixed;
+    inset: 1px;
 }
 div.grid-area_\\[player\\] div.bdr_m {
     border-radius: 0;
 }
-div[aria-label="nicovideo-content"] > section {
+div[aria-label="nicovideo-content"] section {
     grid-template-columns: 100vw;
     grid-template-areas: "player" "bottom" "sidebar";
     padding-inline: 0;
     padding-bottom: 0;
     row-gap: 0;
+    position: fixed;
+    inset: 1px;
 }
 div.grid-area_\\[player\\] > div.pos_relative > div.pos_relative > div.pos_relative:has(video) {
     aspect-ratio: auto;
