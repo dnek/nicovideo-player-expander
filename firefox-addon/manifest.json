@@ -22,7 +22,7 @@
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "nicovideo-player-expander@id-for-addon.dnek.net",
-			"strict_min_version": "109.0"
+			"strict_min_version": "121.0"
 		}
 	}
 }
