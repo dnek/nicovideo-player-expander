@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name			nicovideo-player-expander
 // @namespace		https://github.com/dnek
-// @version			4.0
+// @version			4.1
 // @author			dnek
 // @description		ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化（コントローラー常時表示可能）」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
 // @description:ja	ニコニコ動画のプレイヤーを2種類の方法（「シアターモード」または「ブラウザ内最大化（コントローラー常時表示可能）」）で拡大します。プレイヤー右下のアイコンでこれらの機能を切り替えられます。それぞれtキー、bキーでも（ブラウザ内最大化解除はescキーでも）切り替えられます。「nicovideo-next-video-canceler」「nicovideo-autoplay-canceler」は別のスクリプトです。
@@ -36,7 +36,7 @@ div[aria-label="nicovideo-content"] section {
 	--watch-player-expandable-width-by-browser: calc(
 		100vw
 		- var(--watch-layout-gap-width) * 2
-		- var(--scrollbar-width)
+		- var(--page-scrollbar-width)
 	);
 	--watch-player-expandable-height-by-browser: calc(
 		100vh

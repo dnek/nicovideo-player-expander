@@ -35,7 +35,7 @@ div[aria-label="nicovideo-content"] section {
 	--watch-player-expandable-width-by-browser: calc(
 		100vw
 		- var(--watch-layout-gap-width) * 2
-		- var(--scrollbar-width)
+		- var(--page-scrollbar-width)
 	);
 	--watch-player-expandable-height-by-browser: calc(
 		100vh
